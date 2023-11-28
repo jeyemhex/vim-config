@@ -15,7 +15,7 @@
   nnoremap S  :%s//g<LEFT><LEFT>
   vnoremap S  :s//g<LEFT><LEFT>
 
-  nnoremap <bs> /[I]'m only searching for this ©®@℗ to clear my screen...<cr>
+  nnoremap <bs> /[I]'m only searching for this \<bs\> to clear my screen...<cr>
 
   imap <F7> <Esc>:set spell!<CR>
   nmap <F7> :set spell!<CR>
@@ -23,13 +23,12 @@
   "Ignore common mistypings
   nnoremap q: <nop>
 
-  " Leader mappings
-  let mapleader=" "
-
   " Tab management
   nnoremap <C-Tab> :tabn<CR>
   nnoremap <C-S-Tab> :tabp<CR>
 
+  map <C-w><left> :tabn<cr>
+  map <C-w><right> :tabp<cr>
   " Buffer management
   set hidden
   nnoremap <Leader>` :buffers<CR>:buffer<Space>
@@ -46,3 +45,36 @@
   nnoremap <Leader>0 :10b<CR>
   nnoremap <Leader>- :bp<CR>
   nnoremap <Leader>= :bn<CR>
+
+  let g:termdebug_wide=1
+  nnoremap <Leader>d<cr> :silent call StartTermDebug()<cr>
+  nnoremap <Leader>db :Break<CR>
+  nnoremap <Leader>dd :Clear<CR>
+  nnoremap <Leader>di :Step<CR>
+  nnoremap <Leader>do :Over<CR>
+
+  nnoremap <Leader>du :Until<CR>
+  nnoremap <Leader>df :Finish<CR>
+  nnoremap <Leader>dc :Continue<CR>
+  nnoremap <Leader>ds :Stop<CR>
+
+  nnoremap <Leader>de :Evaluate<CR>
+  vnoremap <Leader>de :'<,'>Evaluate<CR>
+
+  nnoremap <Leader>dl :CocDiagnostics<CR>
+
+  function StartTermDebug()
+    execute ':Termdebug'
+    set cursorline
+
+  endfunction
+
+  map <Up>        <C-W>k
+  map <Down>      <C-W>j
+  map <Left>      <C-W>h
+  map <Right>     <C-W>l
+
+  map <S-Up>        <C-W>K
+  map <S-Down>      <C-W>J
+  map <S-Left>      <C-W>H
+  map <S-Right>     <C-W>L

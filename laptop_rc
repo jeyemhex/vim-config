@@ -1,0 +1,581 @@
+" ======[ Enable vim-plug plugins ]======
+call plug#begin('~/.vim/plugged')
+Plug 'vimwiki/vimwiki'
+"EJH" Plug 'mattn/calendar-vim'
+Plug 'w0rp/ale'
+"EJH" Plug 'dhruvasagar/vim-table-mode'
+Plug 'aperezdc/vim-template'
+Plug 'tpope/vim-fugitive'
+Plug 'preservim/tagbar'
+Plug 'rhysd/conflict-marker.vim'
+"EJH" Plug 'fatih/vim-go'
+"EJH" Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+call plug#end()
+
+" ======[ Set environment defaults ]======
+  " Set the tab width to 2 characters
+  set tabstop=2
+  set shiftwidth=2
+  set softtabstop=2
+  set expandtab
+  
+  set encoding=utf-8
+  set updatetime=300
+  set signcolumn=number
+
+  " Page large files
+  set more
+
+  " Searches for files in subfolders, and show results
+  set path+=**
+  set wildmenu
+
+  " Disable line wrapping
+  set nowrap
+  set sidescroll=2
+  set sidescrolloff=2
+
+  " Allow the cursor to be where there is no character
+  set virtualedit=all
+
+  " Highlight the 100th column (btw, the %100v is the number that sets which column)
+  call matchadd('Colorcolumn','\%100v',100)
+
+  " Add line numbering
+  set number
+
+  " Define the statusbar, and make sure it's always shown
+  set laststatus=2 statusline=%02n:\ %<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
+"EJH"   set laststatus=2 statusline=%02n:\ %<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P\ %{ALEGetStatusLine()}
+
+  " Show trailing whitespace
+  set list listchars=tab:\|�,trail:_,nbsp:~
+
+  " Enable syntax highlighting in vim, and make sure folds start open
+  syntax on
+
+" ======[ Plugin configuration ]======
+  set nocompatible
+"EJH"   let g:ale_sign_error = 'E>'
+"EJH"   let g:ale_sign_warning = 'W>'
+"EJH"   let g:ale_statusline_format = ['| %de', '| %dw', '| =)']
+"EJH"   nmap <silent> [e <Plug>(ale_previous_wrap)
+"EJH"   nmap <silent> ]e <Plug>(ale_next_wrap)
+"EJH"   let g:ale_linters = { 'fortran': [], 'python': ['flake8']}
+"EJH"   let g:ale_python_flake8_executable = 'flake8-python2'
+"EJH" 
+"EJH"   let g:vimwiki_list = [{'path': '~/Documents/vimwiki/',
+"EJH"                         \'auto_toc': 1,
+"EJH"                         \'syntax': 'markdown',
+"EJH"                         \'ext': '.md'}]
+"EJH" 
+"EJH" 
+"EJH" 
+"EJH"   autocmd FileType markdown map <leader>d :VimwikiMakeDiaryNote<CR>
+"EJH"   function! ToggleCalendar()
+"EJH"     execute ":Calendar"
+"EJH"     if exists("g:calendar_open")
+"EJH"       if g:calendar_open == 1
+"EJH"         execute "q"
+"EJH"         unlet g:calendar_open
+"EJH"       else
+"EJH"         g:calendar_open = 1
+"EJH"       end
+"EJH"     else
+"EJH"       let g:calendar_open = 1
+"EJH"     end
+"EJH"   endfunction
+"EJH"   autocmd FileType markdown map <leader>c :call ToggleCalendar()<CR>
+"
+  "" Default values
+  let g:conflict_marker_begin = '^<<<<<<< \@='
+  let g:conflict_marker_common_ancestors = '^||||||| .*$'
+  let g:conflict_marker_separator = '^=======$'
+  let g:conflict_marker_end   = '^>>>>>>> \@='
+
+  " disable the default highlight group
+"EJH"   let g:conflict_marker_highlight_group = ''
+
+
+  highlight ConflictMarkerBegin guibg=#2f7366 ctermbg=1
+  highlight ConflictMarkerOurs guibg=#2e5049 ctermbg=2
+  highlight ConflictMarkerTheirs guibg=#344f69 ctermbg=3
+  highlight ConflictMarkerEnd guibg=#2f628e ctermbg=1
+  highlight ConflictMarkerCommonAncestorsHunk guibg=#754a81 ctermbg=1
+
+
+  let g:netrw_liststyle = 3
+  let g:netrw_banner = 0
+  let g:netrw_browse_split = 4
+  let g:netrw_altv = 0
+  let g:netrw_winsize = 20
+  let g:netrw_list_hide = '^\..*\.sw.'
+  let g:netrw_hide = 1                   " hide by default
+" ======[ Conway's folding ]======
+  " Don't start new buffers folded
+  set foldlevelstart=99
+
+  " Highlight folds
+  highlight Folded  ctermfg=cyan ctermbg=black
+
+  " Toggle on and off...
+  nmap <silent> <expr>  zz  FS_ToggleFoldAroundSearch({'context':1})
+
+  " Show only sub defns (and maybe comments)...
+  let perl_sub_pat = '^\s*\%(sub\|func\|method\|package\)\s\+\k\+'
+  let vim_sub_pat  = '^\s*fu\%[nction!]\s\+\k\+'
+  augroup FoldSub
+      autocmd!
+      autocmd BufEnter * nmap <silent> <expr>  zp  FS_FoldAroundTarget(perl_sub_pat,{'context':1})
+      autocmd BufEnter * nmap <silent> <expr>  za  FS_FoldAroundTarget(perl_sub_pat.'\zs\\|^\s*#.*',{'context':0, 'folds':'invisible'})
+      autocmd BufEnter *.vim,.vimrc nmap <silent> <expr>  zp  FS_FoldAroundTarget(vim_sub_pat,{'context':1})
+      autocmd BufEnter *.vim,.vimrc nmap <silent> <expr>  za  FS_FoldAroundTarget(vim_sub_pat.'\\|^\s*".*',{'context':0, 'folds':'invisible'})
+      autocmd BufEnter * nmap <silent> <expr>             zv  FS_FoldAroundTarget(vim_sub_pat.'\\|^\s*".*',{'context':0, 'folds':'invisible'})
+  augroup END
+
+  " Show only 'use' statements
+  nmap <silent> <expr>  zu  FS_FoldAroundTarget('^\s*use\s\+\S.*;',{'context':1})
+
+  let g:go_version_warning = 0
+  let g:go_template_autocreate = 0
+
+" ======[ Searching ]======
+  set smartcase
+  set ignorecase
+  set incsearch
+  set hlsearch
+
+  " If there's a tags file, let's read from it
+  if filereadable(".tags")
+    set tags=.tags
+  else
+    set tags=""
+  endif
+
+" ======[ Indentation ]======
+  set autoindent
+  set smartindent
+  filetype indent on
+  filetype plugin on
+  filetype plugin indent on
+
+" ======[ Remapped keys ]======
+  " Swap visual and block modes
+  nnoremap v <c-v>
+  nnoremap <c-v> v
+
+  " Get the highlight group for the current word
+  nmap <C-S-P> :call <SID>SynStack()<CR>
+
+  " Single-key shortcuts
+  nnoremap J m`J``
+  nnoremap <expr> M ':%s/' . @/ . '//g<LEFT><LEFT>'
+  vnoremap <expr> M ':s/' . @/ . '//g<LEFT><LEFT>'
+
+  nnoremap S  :%s//g<LEFT><LEFT>
+  vnoremap S  :s//g<LEFT><LEFT>
+
+  nnoremap <bs> /I'm only searching for this ©®@℗ to clear my screen...<cr>
+
+  imap <F7> <Esc>:set spell!<CR>
+  nmap <F7> :set spell!<CR>
+
+  "Ignore common mistypings
+  nnoremap q: <nop>
+
+  " Leader mappings
+  let mapleader=" "
+
+" ======[ Buffer management ]======
+  set hidden
+  nnoremap <Leader>` :buffers<CR>:buffer<Space>
+  nnoremap <Leader><Tab> :b #<CR>
+  nnoremap <Leader>1 :1b<CR>
+  nnoremap <Leader>2 :2b<CR>
+  nnoremap <Leader>3 :3b<CR>
+  nnoremap <Leader>4 :4b<CR>
+  nnoremap <Leader>5 :5b<CR>
+  nnoremap <Leader>6 :6b<CR>
+  nnoremap <Leader>7 :7b<CR>
+  nnoremap <Leader>8 :8b<CR>
+  nnoremap <Leader>9 :9b<CR>
+  nnoremap <Leader>0 :10b<CR>
+  nnoremap <Leader>- :bp<CR>
+  nnoremap <Leader>= :bn<CR>
+
+  nnoremap <leader>sf :Vexplore<cr><c-w>R
+"======[ Language specific options ]======
+
+  "---[ C/C++ ]---
+  function! OnCLaunch()
+    setlocal tabstop=4
+    setlocal shiftwidth=4
+    setlocal softtabstop=4
+
+    map <f5> :make<CR>
+    autocmd BufWritePost *.c,*.cxx,*.cpp call MaybeUpdateTags()
+  endfunction
+
+  autocmd Filetype c,h,cpp,hpp call OnCLaunch()
+
+  "---[ Go ]---
+  function! OnGoLaunch()
+    set noexpandtab
+    setlocal tabstop=4
+    setlocal shiftwidth=4
+    setlocal softtabstop=4
+
+    map <f5> :GoRun<CR>
+    autocmd BufWritePost *.go call MaybeUpdateTags()
+  endfunction
+
+  autocmd Filetype go call OnGoLaunch()
+
+  "---[ Fortran ]---
+  function! OnFortranLaunch()
+    " Nicer syntax
+
+    nmap <f5> :make<CR>
+    setlocal commentstring=!\ %s
+
+    " Next and previous routine aliases
+    nmap [[ k?\v^\s*(recursive\s+)\?(function\|subroutine).*$<CR>ztkjw
+    nmap ]]  /\v^\s*(recursive\s+)?(function\|subroutine).*$<CR>ztkjw
+
+    " C/Perl-esque aliases for Fortran (because why not?)
+    imap += =<esc>^yt=$A <esc>pA+
+    imap -= =<esc>^yt=$A <esc>pA-
+    imap *= =<esc>^yt=$A <esc>pA*
+"EJH"     imap /= =<esc>^yt=$A <esc>pA/
+    imap ++ =<esc>^yt=A<esc>pA+1
+    imap -- =<esc>^yt=A<esc>pA-1
+    imap <bar><bar> .or.
+    imap && .and.
+    imap !! .not.
+
+    " Easy 'say' command
+    iabbrev say print *,
+
+    nmap <leader>fp :%s/module/program/g<CR>13gg2ddl
+
+    autocmd BufWritePost  *.f90       call MaybeUpdateTags()
+  endfunction
+
+  let fortran_free_source=1
+  let fortran_do_enddo=1
+  autocmd Filetype fortran call OnFortranLaunch()
+
+  "---[Javascript ]---
+  function! OnJSLaunch()
+    setlocal tabstop=4
+    setlocal shiftwidth=4
+    setlocal softtabstop=4
+  endfunction
+
+  autocmd Filetype javascript call OnJSLaunch()
+
+  "---[ Perl & Perl6 ]---
+  autocmd BufRead,BufNewFile *.t         setfiletype perl
+  autocmd BufRead,BufNewFile *.p6        setfiletype perl6
+
+  function! OnPerlLaunch()
+    setlocal tabstop=4
+    setlocal shiftwidth=4
+    setlocal softtabstop=4
+
+    "Adjust keyword characters to match Perlish identifiers...
+    set iskeyword+=$
+    set iskeyword+=%
+    set iskeyword+=@-@
+    set iskeyword+=:
+    set iskeyword-=,
+
+
+  endfunction
+
+  function! OnPerl5Launch()
+    nmap <f5> :!perl  %<CR>
+    setlocal matchpairs+=<:>,«:»,/:/
+  endfunction
+
+  function! OnPerl6Launch()
+    nmap <f5> :!perl6 %<CR>; syntax off
+  endfunction
+
+  let b:match_words = '":"'
+  let perl_fold=1
+  let perl_sub_pat = '^\s*\%(sub\|func\|method\|package\)\s\+\k\+'
+  autocmd Filetype perl,perl6 call OnPerlLaunch()
+  autocmd Filetype perl       call OnPerl5Launch()
+  autocmd Filetype perl6      call OnPerl6Launch()
+
+  "---[ Python ]---
+    autocmd FileType python set ts=4  sw=4 sts=4
+    autocmd FileType python nmap <f5> :!python %<CR>
+
+  "---[ Plain text files ]---
+    "Set some defaults
+    autocmd BufRead,BufNewFile *.txt       setfiletype text
+    autocmd FileType text,markdown,vimwiki setlocal nonumber textwidth=80 formatoptions=t
+    autocmd FileType text,markdown,vimwiki let b:vcm_tab_complete = 'dict'
+
+    " Some cool underlingings
+    autocmd FileType text nmap <leader>u0 I* <Esc>A *<Esc>VgUYPv$r*jpv$r*o<CR>
+    autocmd FileType text nmap <leader>u1 Vgu^~Ypv$r=o<Tab>
+    autocmd FileType text nmap <leader>u2 Vgu^~Ypv$r-o<Tab>
+    autocmd FileType text nmap <leader>u3 Vgu^~Ypv$r^o<Tab>
+    autocmd FileType markdown nmap <leader>u1 Vgu^~Ypv$r=o<Tab>
+    autocmd FileType markdown nmap <leader>u2 Vgu^~Ypv$r-o<Tab>
+
+    " Easy-to-reach word count
+    autocmd Filetype text,markdown nmap <leader>w g<c-g>
+
+  "---[ Data files ]---
+    autocmd BufRead,BufNewFile *.dat       setfiletype data
+    autocmd FileType data set tabstop=20
+    autocmd FileType data set shiftwidth=40
+    autocmd FileType data set softtabstop=40
+    autocmd FileType data set noexpandtab
+    autocmd FileType data set nolist
+
+  "---[ Latex ]---
+    autocmd FileType plaintex,tex setlocal textwidth=80 formatoptions=t
+    autocmd FileType plaintex,tex let g:AutoPairs = {}
+    autocmd FileType plaintex,tex nmap <f5> :call MakeLatex()<CR>
+
+  " contains
+    function! MakeLatex()
+      if filereadable("makefile") 
+        make
+      else
+        !pdflatex %
+      endif
+      !killall -s SIGHUP mupdf
+    endfunction
+
+
+  "---[ Makefiles ]---
+    autocmd FileType make set tabstop=8
+    autocmd FileType make set shiftwidth=8
+    autocmd FileType make set softtabstop=8
+    autocmd FileType make setlocal noexpandtab
+    autocmd FileType make setlocal nolist
+
+  "---[ Assembly ]---
+    autocmd BufRead,BufNewFile *.asm       setfiletype asm
+    autocmd BufRead,BufNewFile *.s         setfiletype asm
+    autocmd FileType asm setlocal noexpandtab
+    autocmd FileType asm setlocal nolist
+
+  "---[ Gnuplot scripts ]---
+    autocmd BufRead,BufNewFile *.plt       setfiletype plot
+    autocmd FileType plot nmap <F5> :!gnuplot -p %<CR>
+
+  "---[ Castep input files ]---
+    autocmd FileType castepCell nmap <F5> :!quiet jmol %<CR>
+
+  "---[ Xresources ]---
+    autocmd BufWritePost  .Xresources     :!xrdb %<CR>
+
+
+  "---[ Puppet ]---
+
+  autocmd BufRead,BufNewFile *.pp        setfiletype ruby | call ale#toggle#Disable()
+
+"======[ Diff options ]======
+  " Set some pretty colours for diffing
+  if &diff
+    syntax off
+    hi Folded guifg=#000000 guibg=#000000 gui=bold  ctermfg=15  ctermbg=8 cterm=none
+  endif
+
+  " Update diffing after saving changes
+  autocmd BufWritePost * if &diff | diffupdate | endif
+
+"======[ GUI options ]======
+  if has("gui_running")
+    " Set the colors and fonts for gvim 
+    if strftime("%H") > 19 || strftime("%H") < 7
+      set background=dark
+    else
+      set background=light
+    endif
+
+    set gfn=Monospace\ 12
+    colorscheme PaperColor
+    "colorscheme carduelis
+    nnoremap <leader>zi :set gfn=Monospace\ 14<CR>
+    nnoremap <leader>zo :set gfn=Monospace\ 8<CR>
+    nnoremap <leader>zz :set gfn=Monospace\ 12<CR>
+
+    " No top menu bar, I'd never use it anyway
+    set guioptions-=T
+    set guioptions-=m
+    set guioptions-=r
+  else
+    " Else, pick a nice colorscheme for the terminal
+    set t_Co=256
+    set bg=dark
+    colorscheme urchin
+
+    runtime plugin/hexHighlight.vim
+
+  endif
+
+"======[ Assorted functions ]======
+  " Update tags file if one exists
+  function! MaybeUpdateTags()
+    if filereadable(".tags")
+      silent !ctags --exclude=cellmerge_doc.tex -Rf .tags
+      "echo "Updated tags!"
+    endif
+  endfunction
+
+  " Diff the current file with the last saved version
+  function! s:DiffWithSaved()
+    let filetype=&ft
+    diffthis
+    vnew | r # | normal! 1Gdd
+    diffthis
+    exe "setlocal bt=nofile bh=wipe nobl noswf ro ft=" . filetype
+  endfunction
+  com! DiffSaved call s:DiffWithSaved()
+
+  " See an eps of the current file
+  function! s:SoftCopy()
+    hardcopy > %.eps
+    !gv %.eps
+    !rm %.eps
+  endfunction
+  com! SoftCopy call s:SoftCopy()
+
+"=====[ Add or subtract comments ]===============================
+
+" Work out what the comment character is, by filetype...
+autocmd FileType             *sh,awk,python,perl,perl6,ruby    let b:cmt = exists('b:cmt') ? b:cmt : '#EJH# '
+autocmd FileType             vim                               let b:cmt = exists('b:cmt') ? b:cmt : '"EJH" '
+autocmd FileType             fortran                           let b:cmt = exists('b:cmt') ? b:cmt : '!EJH! '
+autocmd FileType             c,h,cpp                           let b:cmt = exists('b:cmt') ? b:cmt : '//EJH// '
+autocmd FileType             plaintex,tex                      let b:cmt = exists('b:cmt') ? b:cmt : '%EJH% '
+autocmd BufNewFile,BufRead   *.vim,.vimrc                      let b:cmt = exists('b:cmt') ? b:cmt : '"EJH" '
+autocmd BufNewFile,BufRead   *                                 let b:cmt = exists('b:cmt') ? b:cmt : '#EJH# '
+autocmd BufNewFile,BufRead   *.p[lm],.t                        let b:cmt = exists('b:cmt') ? b:cmt : '#EJH# '
+autocmd BufNewFile,BufRead   *.p[lm],.t                        let b:cmt = exists('b:cmt') ? b:cmt : '#EJH# '
+
+" Work out whether the line has a comment then reverse that condition...
+function! ToggleComment ()
+    " What's the comment character???
+    let comment_char = exists('b:cmt') ? b:cmt : '#'
+
+    " Grab the line and work out whether it's commented...
+    let currline = getline(".")
+
+    " If so, remove it and rewrite the line...
+    if currline =~ '^' . comment_char
+        let repline = substitute(currline, '^' . comment_char, "", "")
+        call setline(".", repline)
+
+    " Otherwise, insert it...
+    else
+        let repline = substitute(currline, '^', comment_char, "")
+        call setline(".", repline)
+    endif
+endfunction
+
+" Toggle comments down an entire visual selection of lines...
+function! ToggleBlock () range
+    " What's the comment character???
+    let comment_char = exists('b:cmt') ? b:cmt : '#'
+
+    " Start at the first line...
+    let linenum = a:firstline
+
+    " Get all the lines, and decide their comment state by examining the first...
+    let currline = getline(a:firstline, a:lastline)
+    if currline[0] =~ '^' . comment_char
+        " If the first line is commented, decomment all...
+        for line in currline
+            let repline = substitute(line, '^' . comment_char, "", "")
+            call setline(linenum, repline)
+            let linenum += 1
+        endfor
+    else
+        " Otherwise, encomment all...
+        for line in currline
+            let repline = substitute(line, '^\('. comment_char . '\)\?', comment_char, "")
+            call setline(linenum, repline)
+            let linenum += 1
+        endfor
+    endif
+endfunction
+
+" Set up the relevant mappings
+nmap <silent> # :call ToggleComment()<CR>
+vmap <silent> # :call ToggleBlock()<CR>
+
+"=====[ Smarter interstitial completions of identifiers ]=============
+augroup Undouble_Completions
+    autocmd!
+    autocmd CompleteDone *  call Undouble_Completions()
+augroup None
+
+function! Undouble_Completions ()
+    let col  = getpos('.')[2]
+    let line = getline('.')
+    call setline('.', substitute(line, '\(\k\+\)\%'.col.'c\zs\1', '', ''))
+endfunction
+
+let g:username = 'Edward Higgins'
+let g:email = 'ed.higgins@york.ac.uk'
+
+" ex command for toggling hex mode - define mapping if desired
+command -bar Hexmode call ToggleHex()
+
+" helper function to toggle hex mode
+function ToggleHex()
+  " hex mode should be considered a read-only operation
+  " save values for modified and read-only for restoration later,
+  " and clear the read-only flag for now
+  let l:modified=&mod
+  let l:oldreadonly=&readonly
+  let &readonly=0
+  let l:oldmodifiable=&modifiable
+  let &modifiable=1
+  if !exists("b:editHex") || !b:editHex
+    " save old options
+    let b:oldft=&ft
+    let b:oldbin=&bin
+    " set new options
+    setlocal binary " make sure it overrides any textwidth, etc.
+    silent :e " this will reload the file without trickeries 
+              "(DOS line endings will be shown entirely )
+    let &ft="xxd"
+    " set status
+    let b:editHex=1
+    " switch to hex editor
+    %!xxd
+  else
+    " restore old options
+    let &ft=b:oldft
+    if !b:oldbin
+      setlocal nobinary
+    endif
+    " set status
+    let b:editHex=0
+    " return to normal editing
+    %!xxd -r
+  endif
+  " restore values for modified and read only state
+  let &mod=l:modified
+  let &readonly=l:oldreadonly
+  let &modifiable=l:oldmodifiable
+endfunction
+
+" Show syntax highlighting for current object under cursor
+function! <SID>SynStack()
+  if !exists("*synstack")
+    return
+  endif
+  echo map(synstack(line('.'),col('.')), 'synIDattr(v:val,"name")')
+endfunction
