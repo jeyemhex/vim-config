@@ -1,16 +1,16 @@
 "======[ UI options ]======
   if has("gui_running")
     " Set the colors and fonts for gvim 
-    set lines=32 columns=128
-    set background=dark
+    set lines=32 columns=80
+    set background=light
     "if strftime("%H") >= 18 || strftime("%H") < 7
     "  set background=dark
     "else
     "  set background=light
     "endif
 
-    set gfn=Comic\ Shanns\ 14
-    colorscheme urchin
+    set gfn=Comic\ Shanns\ 24
+    colorscheme PaperColor
     "colorscheme carduelis
     nnoremap <leader>zi :set gfn=Monospace\ 14<CR>
     nnoremap <leader>zo :set gfn=Monospace\ 8<CR>
@@ -28,14 +28,14 @@
     set guioptions+=F
 
     autocmd StdinReadPre * let s:std_in=1
-    autocmd VimEnter * NERDTree | if argc() > 0 || exists("s:std_in") | wincmd p | endif
+    " autocmd VimEnter * NERDTree | if argc() > 0 || exists("s:std_in") | wincmd p | endif
 
     set fillchars+=vert:\ 
 
   else
     " Else, pick a nice colorscheme for the terminal
     set t_Co=256
-    set background=dark
+    set background=light
 
     colorscheme urchin
 

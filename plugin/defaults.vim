@@ -59,6 +59,9 @@
   filetype plugin on
   filetype plugin indent on
 
+  " Make backspace behave normally
+  set backspace=indent,eol,start
+
 
 " ======[ Buffer management ]======
   set hidden

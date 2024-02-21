@@ -20,6 +20,8 @@
   imap <F7> <Esc>:set spell!<CR>
   nmap <F7> :set spell!<CR>
 
+  nmap <F5> :!clear; echo -e "\n"; dart %<cr>
+  nmap <F6> :!clear; echo -e "\n"; flutter run -d linux<cr>
   "Ignore common mistypings
   nnoremap q: <nop>
 
